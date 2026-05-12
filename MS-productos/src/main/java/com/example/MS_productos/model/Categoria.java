@@ -1,36 +1,29 @@
 package com.example.MS_productos.model;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table (name = "Producto")
 @Data
-@AllArgsConstructor
+@Entity
+@Table(name = "categoria")  // minúsculas para coincidir con el SQL
 @NoArgsConstructor
+@AllArgsConstructor
+public class Categoria {
 
-
-
-
-public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "categoria_id", nullable = false)
-    private Categoria categoria;
-
-
-    @NotBlank
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 100)
     private String nombre;
-    private String descripcion;
-    private String imagenUrl;
-    private String unidadMedida;
-    private Boolean activo = true;
 
+    private String descripcion;
+
+    @Column(name = "imagen_url")
+    private String imagenUrl;
 }
