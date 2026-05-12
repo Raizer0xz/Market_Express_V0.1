@@ -11,34 +11,35 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
 @Entity
 @Table(name = "usuarios")
-
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 100, message = "Entre 2 y 100 caracteres")
-    @Column(nullable = false)//le dice a la BD que esa columna no puede tener el valor NULL.
-    private String nombre;  //es equivalente a NOT NULL en SQL
+    @Column(nullable = false)
+    private String nombre;
 
-    @NotBlank(message = "El email es Obligatorio")
-    @Email(message = "Formateo de Email invalido")
-    @Column(nullable = false,unique = true)//Nadie puede registrarse con un email que ya existe en la BD.
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Formato de email invalido")
+    @Column(nullable = false, unique = true)
     private String email;
 
     @NotBlank(message = "La contraseña es obligatoria")
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Size(min = 9,max = 15,message = "Telefono entre 9 y 15 caracteres")
-    @Column(length = 15)//Define el tamaño máximo del VARCHAR en la BD
+    @Size(min = 9, max = 15, message = "Telefono entre 9 y 15 caracteres")
+    @Column(length = 15)
     private String telefono;
 
     @NotBlank(message = "El rol es obligatorio")
@@ -46,7 +47,6 @@ public class Usuario {
     private String rol;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = true)//Este campo se puede modificar después de crearse. Si intentas hacer un UPDATE sobre el.
+    @Column(name = "created_at", updatable = false) // false = no se puede modificar después de crearse
     private LocalDateTime createdAt;
 }
-

@@ -3,6 +3,7 @@ package com.example.MS_gateway_security.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,21 +37,21 @@ public class JwtService {
 
     public String generarToken(String email, Long usuarioId, String rol) {
         return Jwts.builder()
-                .subject(email)
+                .setSubject(email)
                 .claim("usuarioId", usuarioId)
                 .claim("rol", rol)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(getKey())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+                .signWith(getKey(), SignatureAlgorithm.HS256) // HS256 explícito, evita WeakKeyException
                 .compact();
     }
 
     public Claims extraerClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getKey())
+        return Jwts.parserBuilder()
+                .setSigningKey(getKey())
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public String extraerEmail(String token)     { return extraerClaims(token).getSubject(); }

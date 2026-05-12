@@ -33,6 +33,17 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
         }
     }
+    /*
+    POST http://localhost:9099/auth/registrar
+    Content-Type: application/json
+
+    {
+      "usuarioId": 1,
+      "email": "admin@marketexpress.com",
+      "password": "admin123",
+      "rol": "ADMIN"
+    }
+     */
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
@@ -42,6 +53,15 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
     }
+    /*
+    POST http://localhost:9099/auth/login
+    Content-Type: application/json
+
+    {
+      "email": "admin@marketexpress.com",
+      "password": "admin123"
+    }
+     */
 
     // Los otros microservicios mandan: Authorization: Bearer <token>
     @PostMapping("/validar")
@@ -59,6 +79,21 @@ public class AuthController {
         return response.isValido() ? ResponseEntity.ok(response)
                 : ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
+    /*
+    2
+    Valida el token — pestaña Authorization
+    POST
+    http://localhost:9099/auth/validar
+    Authorization
+    Headers
+    Body
+    Auth type	Bearer Token
+    Token
+    eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYXJrZXRleHByZXNzLmNvbSIsInVzdWFyaW9JZCI6MSwicm9sIjoiQURNSU4iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MTcwMDA4NjQwMH0.FIRMA
+    Aquí pegas el token que te devolvió el login. Postman agrega el
+    Bearer
+    automáticamente.
+         */
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
