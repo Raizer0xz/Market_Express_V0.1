@@ -2,6 +2,7 @@ package com.example.MS_pagos.controller;
 
 import com..pagos.model.Pago;
 import com.example.MS_pagos.controller.MetodoPago;
+import com.example.MS_pagos.modelo.Pago;
 import com.sistema.pagos.dto.PagoRequest;
 import com.sistema.pagos.service.PagoService;
 import org.springframework.beans.factory.annotation.Autowired;

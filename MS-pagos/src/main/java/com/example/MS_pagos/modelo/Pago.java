@@ -1,4 +1,4 @@
-package com.sistema.pagos.model;
+package com.example.MS_pagos.modelo;
 
 import com.example.MS_pagos.modelo.EstadoPago;
 import com.example.MS_pagos.modelo.MetodoPago;
