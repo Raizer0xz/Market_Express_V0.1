@@ -1,5 +1,5 @@
 package com.example.MS_pagos.modelo;
 
-enum EstadoPago {
+public  enum EstadoPago {
     PENDIENTE, PROCESANDO, COMPLETADO, RECHAZADO
 }

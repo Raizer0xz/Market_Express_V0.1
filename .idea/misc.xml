@@ -12,6 +12,9 @@
         <option value="$PROJECT_DIR$/MS-productos/pom.xml" />
         <option value="$PROJECT_DIR$/MS-pedidos/pom.xml" />
         <option value="$PROJECT_DIR$/MS-inventario/pom.xml" />
+        <option value="$PROJECT_DIR$/MS-carrito/pom.xml" />
+        <option value="$PROJECT_DIR$/MS-delivery/pom.xml" />
+        <option value="$PROJECT_DIR$/MS-pagos/pom.xml" />
       </list>
     </option>
   </component>
