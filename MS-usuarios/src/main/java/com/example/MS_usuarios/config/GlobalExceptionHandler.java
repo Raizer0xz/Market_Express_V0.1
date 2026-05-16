@@ -1,4 +1,4 @@
-package com.example.MS_carrito.config;
+package com.example.MS_usuarios.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,12 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * GlobalExceptionHandler - MS-Carrito
+ * GlobalExceptionHandler - MS-Usuarios
+ * Centraliza el manejo de errores para devolver respuestas JSON claras.
  *
  * Captura:
- *   - MethodArgumentNotValidException: errores de @Valid en ItemCarrito
- *     (cantidad < 1, precioUnitario negativo, etc.)
- *   - RuntimeException: carrito no encontrado, usuario ya tiene carrito activo, etc.
+ *   - MethodArgumentNotValidException: errores de @Valid (@NotBlank, @Email, etc.)
+ *   - RuntimeException: errores de negocio (usuario no encontrado, etc.)
  *   - Exception: cualquier error inesperado -> 500
  */
 @RestControllerAdvice
@@ -25,8 +25,9 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     /**
-     * Captura errores de validacion (@Valid).
-     * Ejemplo: cantidad=0 falla @Min(1), precioUnitario negativo falla @Positive.
+     * Captura errores de validacion (@Valid en controller).
+     * Devuelve un mapa con campo -> mensaje de error.
+     * Ejemplo: { "email": "Formato de email invalido", "nombre": "El nombre es obligatorio" }
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
@@ -36,7 +37,7 @@ public class GlobalExceptionHandler {
             String mensaje = error.getDefaultMessage();
             errores.put(campo, mensaje);
         });
-        log.warn("Error de validacion en MS-carrito: {}", errores);
+        log.warn("Error de validacion en MS-usuarios: {}", errores);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of(
@@ -47,32 +48,30 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Captura RuntimeException del service.
-     * Ejemplos: "No hay carrito activo", "El usuario ya tiene un carrito activo",
-     * "Carrito no encontrado", "Item no encontrado".
+     * Captura RuntimeException del service (ej: usuario no encontrado).
      */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
-        log.error("RuntimeException en MS-carrito: {}", ex.getMessage());
-        // Distinguir 404 vs 400 por el mensaje
-        if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("no encontrado")) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("status", 404, "error", ex.getMessage()));
-        }
+        log.error("RuntimeException en MS-usuarios: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("status", 400, "error", ex.getMessage()));
+                .body(Map.of(
+                        "status", 400,
+                        "error", ex.getMessage()
+                ));
     }
 
     /**
-     * Captura errores inesperados -> 500
+     * Captura cualquier error inesperado -> 500.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
-        log.error("Error inesperado en MS-carrito: {}", ex.getMessage(), ex);
+        log.error("Error inesperado en MS-usuarios: {}", ex.getMessage(), ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("status", 500, "error", "Error interno del servidor"));
+                .body(Map.of(
+                        "status", 500,
+                        "error", "Error interno del servidor"
+                ));
     }
 }

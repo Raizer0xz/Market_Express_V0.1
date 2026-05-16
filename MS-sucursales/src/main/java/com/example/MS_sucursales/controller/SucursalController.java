@@ -24,7 +24,7 @@ import java.util.Map;
  * GET    /sucursales/health       → verifica que el servicio está activo
  */
 @RestController
-@RequestMapping("/sucursales")
+@RequestMapping("/api/v1/sucursales")
 @RequiredArgsConstructor
 public class SucursalController {
 

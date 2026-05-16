@@ -1,4 +1,4 @@
-package com.example.MS_carrito.config;
+package com.example.MS_pagos.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,12 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * GlobalExceptionHandler - MS-Carrito
+ * GlobalExceptionHandler - MS-Pagos
  *
  * Captura:
- *   - MethodArgumentNotValidException: errores de @Valid en ItemCarrito
- *     (cantidad < 1, precioUnitario negativo, etc.)
- *   - RuntimeException: carrito no encontrado, usuario ya tiene carrito activo, etc.
+ *   - MethodArgumentNotValidException: errores de @Valid en PagoRequest
+ *   - IllegalArgumentException: metodo de pago invalido (MetodoPago.valueOf falla)
+ *   - RuntimeException: transaccion no encontrada, etc.
  *   - Exception: cualquier error inesperado -> 500
  */
 @RestControllerAdvice
@@ -25,8 +25,8 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     /**
-     * Captura errores de validacion (@Valid).
-     * Ejemplo: cantidad=0 falla @Min(1), precioUnitario negativo falla @Positive.
+     * Captura errores de @Valid en PagoRequest.
+     * Ejemplo: monto null, metodo vacio, pedidoId null.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
             String mensaje = error.getDefaultMessage();
             errores.put(campo, mensaje);
         });
-        log.warn("Error de validacion en MS-carrito: {}", errores);
+        log.warn("Error de validacion en MS-pagos: {}", errores);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of(
@@ -47,14 +47,24 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Captura RuntimeException del service.
-     * Ejemplos: "No hay carrito activo", "El usuario ya tiene un carrito activo",
-     * "Carrito no encontrado", "Item no encontrado".
+     * Captura IllegalArgumentException lanzada cuando el metodo de pago
+     * no existe en el enum MetodoPago.
+     * Ejemplo: metodo="PAYPAL" cuando MetodoPago solo tiene EFECTIVO, DEBITO, etc.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("Argumento invalido en MS-pagos: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("status", 400, "error", ex.getMessage()));
+    }
+
+    /**
+     * Captura RuntimeException (transaccion no encontrada, etc.).
      */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
-        log.error("RuntimeException en MS-carrito: {}", ex.getMessage());
-        // Distinguir 404 vs 400 por el mensaje
+        log.error("RuntimeException en MS-pagos: {}", ex.getMessage());
         if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("no encontrado")) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
@@ -70,7 +80,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
-        log.error("Error inesperado en MS-carrito: {}", ex.getMessage(), ex);
+        log.error("Error inesperado en MS-pagos: {}", ex.getMessage(), ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("status", 500, "error", "Error interno del servidor"));

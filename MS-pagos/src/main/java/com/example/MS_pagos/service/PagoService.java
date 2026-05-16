@@ -23,15 +23,35 @@ public class PagoService {
 
     @Transactional
     public Pago procesarPago(PagoRequest request) {
-        Pago pago = new Pago();
-        pago.setPedidoId(request.getPedidoId());
-        pago.setMonto(request.getMonto());
-        pago.setMoneda(request.getMoneda() != null ? request.getMoneda() : "CLP");
-        pago.setMetodo(MetodoPago.valueOf(request.getMetodo().toUpperCase()));
-        pago.setEstado(EstadoPago.PROCESANDO);
-        pago.setTransaccionId(UUID.randomUUID().toString());
-        log.info("Procesando pago para pedido {} por ${}", request.getPedidoId(), request.getMonto());
-        return pagoRepository.save(pago);
+        log.info("Iniciando procesamiento de pago para pedido: {} | monto: {} | metodo: {}",
+                request.getPedidoId(), request.getMonto(), request.getMetodo());
+
+        // FIX: MetodoPago.valueOf() puede lanzar IllegalArgumentException si el valor
+        // no existe en el enum. Se captura y relanza con mensaje claro.
+        MetodoPago metodoPago;
+        try {
+            metodoPago = MetodoPago.valueOf(request.getMetodo().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.warn("Metodo de pago invalido: {}", request.getMetodo());
+            throw new IllegalArgumentException(
+                    "Metodo de pago invalido: '" + request.getMetodo() +
+                            "'. Valores aceptados: " + Arrays.toString(MetodoPago.values())
+            );
+        }
+
+        Pago pago = Pago.builder()
+                .pedidoId(request.getPedidoId())
+                .monto(request.getMonto().doubleValue()) // compatibilidad con entidad actual
+                .moneda(request.getMoneda() != null ? request.getMoneda() : "CLP")
+                .metodo(metodoPago)
+                .estado(EstadoPago.PROCESANDO)
+                .transaccionId(UUID.randomUUID().toString())
+                .build();
+
+        Pago guardado = pagoRepository.save(pago);
+        log.info("Pago creado exitosamente. TransaccionId: {} | Estado: {}",
+                guardado.getTransaccionId(), guardado.getEstado());
+        return guardado;
     }
 
     @Transactional(readOnly = true)
@@ -41,19 +61,26 @@ public class PagoService {
 
     @Transactional(readOnly = true)
     public List<Pago> obtenerPorPedido(Long pedidoId) {
+        log.info("Consultando pagos del pedido: {}", pedidoId);
         return pagoRepository.findByPedidoId(pedidoId);
     }
 
     @Transactional
     public Pago confirmarTransaccion(String transaccionId, String status) {
+        log.info("Confirmando transaccion: {} con status: {}", transaccionId, status);
         Pago pago = pagoRepository.findByTransaccionId(transaccionId)
-                .orElseThrow(() -> new RuntimeException("Pago no encontrado: " + transaccionId));
+                .orElseThrow(() -> {
+                    log.warn("Transaccion no encontrada: {}", transaccionId);
+                    return new RuntimeException("Pago no encontrado con transaccionId: " + transaccionId);
+                });
 
-        pago.setEstado("SUCCESS".equalsIgnoreCase(status)
+        EstadoPago nuevoEstado = "SUCCESS".equalsIgnoreCase(status)
                 ? EstadoPago.COMPLETADO
-                : EstadoPago.RECHAZADO);
+                : EstadoPago.RECHAZADO;
 
-        log.info("Pago {} → {}", transaccionId, pago.getEstado());
-        return pagoRepository.save(pago);
+        pago.setEstado(nuevoEstado);
+        Pago actualizado = pagoRepository.save(pago);
+        log.info("Transaccion {} -> Estado: {}", transaccionId, nuevoEstado);
+        return actualizado;
     }
 }
