@@ -9,8 +9,3 @@ CREATE TABLE credenciales (
     activo      BOOLEAN      NOT NULL DEFAULT TRUE,
     created_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
 );
-
--- Usuario admin de prueba
--- password_hash corresponde a 'admin123' encriptado con BCrypt
-INSERT INTO credenciales (usuario_id, email, password_hash, rol)
-VALUES (1, 'admin@marketexpress.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqvS2', 'ADMIN');

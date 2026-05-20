@@ -7,7 +7,6 @@
         <option value="$PROJECT_DIR$/MS-eureka-server/pom.xml" />
         <option value="$PROJECT_DIR$/MS-usuarios/pom.xml" />
         <option value="$PROJECT_DIR$/MS-seguridad/pom.xml" />
-        <option value="$PROJECT_DIR$/MS-gateway/pom.xml" />
         <option value="$PROJECT_DIR$/MS-sucursales/pom.xml" />
         <option value="$PROJECT_DIR$/MS-productos/pom.xml" />
         <option value="$PROJECT_DIR$/MS-pedidos/pom.xml" />
@@ -15,6 +14,7 @@
         <option value="$PROJECT_DIR$/MS-carrito/pom.xml" />
         <option value="$PROJECT_DIR$/MS-delivery/pom.xml" />
         <option value="$PROJECT_DIR$/MS-pagos/pom.xml" />
+        <option value="$PROJECT_DIR$/MS-gateway/pom.xml" />
       </list>
     </option>
   </component>

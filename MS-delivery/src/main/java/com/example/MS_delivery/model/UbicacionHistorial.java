@@ -31,19 +31,22 @@ public class UbicacionHistorial {
     private Delivery delivery;
 
     @NotNull
-    @Column(nullable = false, precision = 10, scale = 7)
+    @Column(nullable = false)
     private Double latitud;
 
     @NotNull
-    @Column(nullable = false, precision = 10, scale = 7)
+    @Column(nullable = false)
     private Double longitud;
 
-    @Column(name = "velocidad_kmh", precision = 5, scale = 2)
+    @NotNull
+    @Column(name = "velocidad_kmh")
     private Double velocidadKmh;
 
-    @Column(name = "precision_m", precision = 6, scale = 2)
+    @NotNull
+    @Column(name = "precision_m")
     private Double precisionM;
 
+    @NotNull
     @Column(nullable = false)
     @Builder.Default
     private LocalDateTime timestamp = LocalDateTime.now();

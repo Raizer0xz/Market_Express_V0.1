@@ -35,10 +35,10 @@ public class Delivery {
     @Column(name = "direccion_destino", nullable = false)
     private String direccionDestino;
 
-    @Column(name = "latitud_destino", precision = 10, scale = 7)
+    @Column(name = "latitud_destino")
     private Double latitudDestino;
 
-    @Column(name = "longitud_destino", precision = 10, scale = 7)
+    @Column(name = "longitud_destino")
     private Double longitudDestino;
 
     @Enumerated(EnumType.STRING)

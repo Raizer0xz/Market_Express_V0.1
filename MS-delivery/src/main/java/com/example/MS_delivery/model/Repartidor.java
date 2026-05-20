@@ -50,12 +50,12 @@ public class Repartidor {
     private EstadoRepartidor estado = EstadoRepartidor.LIBRE;
 
     // Última posición conocida — se sobreescribe en cada ping GPS
-    @Column(precision = 10, scale = 7)
+    @Column
     private Double latitud;
 
-    @Column(precision = 10, scale = 7)
+    @Column
     private Double longitud;
-
+    
     @Column(name = "ultima_ubicacion")
     private LocalDateTime ultimaUbicacion;
 
