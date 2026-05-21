@@ -22,7 +22,7 @@ public class RegisterRequest {
     private String password;
 
     @NotBlank(message = "El rol es obligatorio")
-    @Pattern(regexp = "^(CLIENTE|REPARTIDOR|ADMIN_SUCURSAL)$",
-            message = "El rol debe ser uno de los siguientes: CLIENTE, REPARTIDOR, ADMIN_SUCURSAL")
+    @Pattern(regexp = "^(CLIENTE|REPARTIDOR|ADMIN_SUCURSAL|ADMIN)$",
+            message = "El rol debe ser uno de los siguientes: CLIENTE, REPARTIDOR, ADMIN_SUCURSAL, ADMIN")
     private String rol;
 }
